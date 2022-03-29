@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 #define MAX_NAME 20
-#define MAX_TEL 11
+#define MAX_TEL 12
 #define MAX_SURNAME 20
 #define USERS_NUMBER 10
 
@@ -28,9 +28,11 @@ int main(void){
 		printf("6) Find user by surname.\n");
 		printf("Insert another key for exit.\n");
 		int choice;
-		while ( choice == '\n' && choice == EOF ){
-                choice = getchar() - '0';
-        }
+		do{
+			choice = getchar();
+		}while (choice == '\n');
+		choice -= '0';
+		getchar();
 		switch(choice){
 			case 1:
 				{
@@ -66,6 +68,15 @@ int main(void){
 				{
 					if(users_counter > 0){
 						--users_counter;
+						for(int i = 0; i < MAX_NAME; ++i){
+							users[users_counter].name[i] = '0';
+						}
+						for(int i = 0; i < MAX_SURNAME; ++i){
+							users[users_counter].surname[i] = '0';
+						}
+						for(int i = 0; i < MAX_TEL; ++i){
+							users[users_counter].tel[i] = '0';
+						}
 					}else{
 						printf("Users list is clear.\n");
 					}
@@ -76,7 +87,7 @@ int main(void){
 					if(users_counter != 0){
 						printf("Searching user by phone number:\n");
 						printf("\tInsert phone number: ");
-						char ser_tel[MAX_TEL];
+						char ser_tel[MAX_TEL] = {'0'};
 						fgets(ser_tel, MAX_TEL, stdin);
 						int ser_flag = 0;
 						for(int i = 0; i < users_counter; ++i){
@@ -88,15 +99,17 @@ int main(void){
 								}
 							}
 							if(curr_flag == 0){
-								ser_flag = i;
+								ser_flag = i+1;
 								break;
 							}
 						}
 						if(ser_flag != 0){
 							printf("User found (#%d):\n", ser_flag);
-							printf("\tName: %s\n", users[ser_flag].name);
-							printf("\tSurname: %s\n", users[ser_flag].surname);
-							printf("\tPhone number: %s\n\n", users[ser_flag].tel);
+							printf("\tName: %s\n", users[ser_flag-1].name);
+							printf("\tSurname: %s\n", users[ser_flag-1].surname);
+							printf("\tPhone number: %s\n\n", users[ser_flag-1].tel);
+						}else{
+							printf("User is not found.\n");
 						}
 					}else{
 						printf("Users list is clear.\n");
@@ -108,7 +121,7 @@ int main(void){
 					if(users_counter != 0){
 						printf("Searching user by name:\n");
 						printf("\tInsert name: ");
-						char ser_name[MAX_NAME];
+						char ser_name[MAX_NAME] = {'0'};
 						fgets(ser_name, MAX_NAME, stdin);
 						int ser_flag = 0;
 						for(int i = 0; i < users_counter; ++i){
@@ -120,15 +133,17 @@ int main(void){
 								}
 							}
 							if(curr_flag == 0){
-								ser_flag = i;
+								ser_flag = i+1;
 								break;
 							}
 						}
 						if(ser_flag != 0){
 							printf("User found (#%d):\n", ser_flag);
-							printf("\tName: %s\n", users[ser_flag].name);
-							printf("\tSurname: %s\n", users[ser_flag].surname);
-							printf("\tPhone number: %s\n\n", users[ser_flag].tel);
+							printf("\tName: %s\n", users[ser_flag-1].name);
+							printf("\tSurname: %s\n", users[ser_flag-1].surname);
+							printf("\tPhone number: %s\n\n", users[ser_flag-1].tel);
+						}else{
+							printf("User is not found.\n");
 						}
 					}else{
 						printf("Users list is clear.\n");
@@ -139,8 +154,8 @@ int main(void){
 				{
 					if(users_counter != 0){
 						printf("Searching user by surname:\n");
-						printf("\tInsert name: ");
-						char ser_surname[MAX_SURNAME];
+						printf("\tInsert surname: ");
+						char ser_surname[MAX_SURNAME] = {'0'};
 						fgets(ser_surname, MAX_SURNAME, stdin);
 						int ser_flag = 0;
 						for(int i = 0; i < users_counter; ++i){
@@ -152,15 +167,17 @@ int main(void){
 								}
 							}
 							if(curr_flag == 0){
-								ser_flag = i;
+								ser_flag = i+1;
 								break;
 							}
 						}
 						if(ser_flag != 0){
 							printf("User found (#%d):\n", ser_flag);
-							printf("\tName: %s\n", users[ser_flag].name);
-							printf("\tSurname: %s\n", users[ser_flag].surname);
-							printf("\tPhone number: %s\n\n", users[ser_flag].tel);
+							printf("\tName: %s\n", users[ser_flag-1].name);
+							printf("\tSurname: %s\n", users[ser_flag-1].surname);
+							printf("\tPhone number: %s\n\n", users[ser_flag-1].tel);
+						}else{
+							printf("User is not found.\n");
 						}
 					}else{
 						printf("Users list is clear.\n");
