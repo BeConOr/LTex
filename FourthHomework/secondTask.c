@@ -51,6 +51,15 @@ int main(void){
 			case 2:
 				{
 					if(users_counter < USERS_NUMBER){
+						/*for(int i = 0; i < MAX_NAME; ++i){
+							users[users_counter].name[i] = '0';
+						}
+						for(int i = 0; i < MAX_SURNAME; ++i){
+							users[users_counter].surname[i] = '0';
+						}
+						for(int i = 0; i < MAX_TEL; ++i){
+							users[users_counter].tel[i] = '0';
+						}*/
 						printf("Adding new user:\n");
 						printf("\tInput name: ");
 						fgets(users[users_counter].name, MAX_NAME, stdin);
@@ -68,15 +77,7 @@ int main(void){
 				{
 					if(users_counter > 0){
 						--users_counter;
-						for(int i = 0; i < MAX_NAME; ++i){
-							users[users_counter].name[i] = '0';
-						}
-						for(int i = 0; i < MAX_SURNAME; ++i){
-							users[users_counter].surname[i] = '0';
-						}
-						for(int i = 0; i < MAX_TEL; ++i){
-							users[users_counter].tel[i] = '0';
-						}
+						printf("The last user deleted.\n");
 					}else{
 						printf("Users list is clear.\n");
 					}
@@ -127,22 +128,26 @@ int main(void){
 						for(int i = 0; i < users_counter; ++i){
 							int curr_flag = 0;
 							for(int j = 0; j < MAX_NAME; ++j){
+								if((users[i].name[j] == '\n') || (ser_name[j] == '\n')){
+									if(users[i].name[j] != ser_name[j]){
+										curr_flag = 1;
+									}
+									break;
+								}
 								if(users[i].name[j] != ser_name[j]){
 									curr_flag = 1;
 									break;
 								}
 							}
 							if(curr_flag == 0){
-								ser_flag = i+1;
-								break;
+								ser_flag = 1;
+								printf("User found (#%d):\n", i+1);
+								printf("\tName: %s\n", users[i].name);
+								printf("\tSurname: %s\n", users[i].surname);
+								printf("\tPhone number: %s\n\n", users[i].tel);
 							}
 						}
-						if(ser_flag != 0){
-							printf("User found (#%d):\n", ser_flag);
-							printf("\tName: %s\n", users[ser_flag-1].name);
-							printf("\tSurname: %s\n", users[ser_flag-1].surname);
-							printf("\tPhone number: %s\n\n", users[ser_flag-1].tel);
-						}else{
+						if(ser_flag == 0){
 							printf("User is not found.\n");
 						}
 					}else{
@@ -161,22 +166,26 @@ int main(void){
 						for(int i = 0; i < users_counter; ++i){
 							int curr_flag = 0;
 							for(int j = 0; j < MAX_SURNAME; ++j){
+								if((users[i].surname[j] == '\n') || (ser_surname[j] == '\n')){
+									if(users[i].surname[j] != ser_surname[j]){
+										curr_flag = 1;
+									}
+									break;
+								}
 								if(users[i].surname[j] != ser_surname[j]){
 									curr_flag = 1;
 									break;
 								}
 							}
 							if(curr_flag == 0){
-								ser_flag = i+1;
-								break;
+								ser_flag = 1;
+								printf("User found (#%d):\n", i+1);
+								printf("\tName: %s\n", users[i].name);
+								printf("\tSurname: %s\n", users[i].surname);
+								printf("\tPhone number: %s\n\n", users[i].tel);
 							}
 						}
-						if(ser_flag != 0){
-							printf("User found (#%d):\n", ser_flag);
-							printf("\tName: %s\n", users[ser_flag-1].name);
-							printf("\tSurname: %s\n", users[ser_flag-1].surname);
-							printf("\tPhone number: %s\n\n", users[ser_flag-1].tel);
-						}else{
+						if(ser_flag == 0){
 							printf("User is not found.\n");
 						}
 					}else{
@@ -187,6 +196,6 @@ int main(void){
 			default: break;
 		}
 		flag = choice;
-	}while((flag < 9) && (flag > 0));
+	}while((flag < 7) && (flag > 0));
 	return 0;
 }
