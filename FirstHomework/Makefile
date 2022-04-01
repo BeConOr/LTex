@@ -8,8 +8,8 @@ CFLAGS := -g
 .PHONY: clean
 
 $(BIN): $(OBJECTS)
-		$(CC) -o $(BIN) $(OBJECTS) $(CFLAGS)
+	$(CC) -o $(BIN) $(OBJECTS) $(CFLAGS)
 $(OBJECTS): $(HEADERS)
 
 clean:
-		rm $(BIN) $(OBJECTS)
+	rm $(BIN) $(OBJECTS)
