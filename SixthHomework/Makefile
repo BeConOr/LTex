@@ -1,8 +1,8 @@
-BIN := secondTask
-SOURCES := secondTask.c
+BIN := phone_book
+SOURCES := phone_book.c
 HEADERS :=
 CC := gcc
-OBJECTS := secondTask.o
+OBJECTS := phone_book.o
 CFLAGS := -g
 
 .PHONY: clean
