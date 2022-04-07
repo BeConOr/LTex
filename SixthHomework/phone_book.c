@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <malloc.h>
 
 #define MAX_NAME 20
 #define MAX_TEL 12
