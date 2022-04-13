@@ -1,0 +1,35 @@
+BIN := calc
+SOURCES := main.c
+HEADERS := math_methods.h
+CC := gcc
+OBJECTS := main.o
+LIBRARY := lmath_methods
+LIBFILES := libmath_methods.so
+LIBOBJ := my_sum.o my_sub.o my_div.o my_mul.o
+CFLAGS := -g
+LFLAGS := -Wl,-rpath,.
+OFLAGS := -c -fPIC
+
+.PHONY: clean
+
+$(BIN): $(OBJECTS) $(LIBFILES)
+	$(CC) -o $(BIN) $(OBJECTS) $(CFLAGS) -L. -$(LIBRARY) $(LFLAGS)
+$(OBJECTS): $(HEADERS)
+
+$(LIBFILES): $(LIBOBJ)
+	$(CC) -shared $(LIBOBJ) -o $(LIBFILES)
+
+my_sum.o: my_sum.c
+	$(CC) $(OFLAGS) my_sum.c
+
+my_sub.o: my_sub.c
+	$(CC) $(OFLAGS) my_sub.c
+
+my_div.o: my_div.c
+	$(CC) $(OFLAGS) my_div.c
+	
+my_mul.o: my_mul.c
+	$(CC) $(OFLAGS) my_mul.c
+
+clean:
+	rm -f $(BIN) *.o *.so

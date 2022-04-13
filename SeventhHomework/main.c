@@ -3,14 +3,11 @@
 #include <stdlib.h>
 
 char my_getc();
-enum symb {SUM, SUB, DIV, MUL};
-
-double ()
 
 int main(void)
 {
 	//It's a simple computing app.
-	double (*func[4])(double, double) = {my_sum, my_sub, my_div, my_mul};
+	double (*func[])(double, double) = {[(int)'+']=my_sum, [(int)'-']=my_sub, [(int)'/']=my_div, [(int)'*']=my_mul};
 	printf("Insert m if you want to read a manual or any key if don't: ");
 	char man_flag = my_getc(); //manage flag
 	if(man_flag == 'm'){
@@ -23,37 +20,35 @@ int main(void)
 	char symb = 0;
 	do{
 		if(numb_flag){
-			scanf("%g\n", &first_it);
+			scanf("%lf", &first_it);
 			numb_flag = 0;
 		}
 		symb = my_getc();
-		if(symb == 'm'){
-			printf("Result: %g\n", first_it);
+		if(symb == '='){
+			printf("Result: %f\n", first_it);
 			printf("Input 'c' if you want to close app: ");
 			man_flag = my_getc();
 			if(man_flag == 'c') return 0;
 			numb_flag = 1;
 			continue;
 		}
-		scanf("%g\n", &second_it);
+		scanf("%lf", &second_it);
 		int incor_flag = 0;
 		do{
 			incor_flag = 0;
 			switch(symb){
-				case '+':{
-					first_it = my_sum(first_it, second_it);
-					break;
-				}
-				case '-':{
-					first_it = my_sub(first_it, second_it);
-					break;
-				}
+				case '+':
+				case '-':
 				case '/':{
-					first_it = my_div(first_it, second_it);
-					break;
+					if((second_it-0.0) < 0.00000000000000001){
+						printf("Error: division by zero.\n");
+						printf("Input all arguments again.\n");
+						numb_flag = 1;
+						break;
+					}
 				}
 				case '*':{
-					first_it = my_mul(first_it, second_it);
+					first_it = func[(int)symb](first_it, second_it);
 					break;
 				}
 				default:{
