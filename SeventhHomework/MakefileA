@@ -1,0 +1,34 @@
+BIN := calc
+SOURCES := main.c
+HEADERS := math_methods.h
+CC := gcc
+OBJECTS := main.o
+LIBRARY := lmath_methods
+LIBFILES := libmath_methods.a
+LIBOBJ := my_sum.o my_sub.o my_div.o my_mul.o
+CFLAGS := -g
+OFLAGS := -c
+
+.PHONY: clean
+
+$(BIN): $(OBJECTS) $(LIBFILES)
+	$(CC) -o $(BIN) $(OBJECTS) $(CFLAGS) -L. -$(LIBRARY)
+$(OBJECTS): $(HEADERS)
+
+$(LIBFILES): $(LIBOBJ)
+	ar cr $(LIBFILES) $(LIBOBJ)
+
+my_sum.o: my_sum.c
+	$(CC) $(OFLAGS) my_sum.c
+
+my_sub.o: my_sub.c
+	$(CC) $(OFLAGS) my_sub.c
+
+my_div.o: my_div.c
+	$(CC) $(OFLAGS) my_div.c
+	
+my_mul.o: my_mul.c
+	$(CC) $(OFLAGS) my_mul.c
+
+clean:
+	rm -f $(BIN) *.o *.a
