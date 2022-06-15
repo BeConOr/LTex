@@ -16,7 +16,7 @@ int main(void)
 	WINDOW * wnd;
 	WINDOW * subwnd;
 	
-	char * text = (char *) alloc(MAX_DOC_SIZE * sizeof(char));
+	char * text = (char *) malloc(MAX_DOC_SIZE * sizeof(char));
 	
 	initscr();
 	signal(SIGWINCH, sig_winch);
