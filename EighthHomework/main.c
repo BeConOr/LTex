@@ -4,17 +4,19 @@
 #include <stdlib.h>
 #include <curses.h>
 #include <malloc.h>
+#include "input.h"
 
 #define MAX_DOC_SIZE 20971520
+#define WINDOW_WIDTH 120
 
 void sig_winch(int signo);
-
-void text_input(WINDOW * win, size_t max_len);
 
 int main(void)
 {
 	WINDOW * wnd;
-	WINDOW * subwnd;
+	WINDOW * text_wnd;
+    WINDOW * command_wnd;
+    struct INPUT_WINDOWS windows = {text_wnd, command_wnd, WINDOW_WIDTH};
 	
 	char * text = (char *) malloc(MAX_DOC_SIZE * sizeof(char));
 	
@@ -24,17 +26,16 @@ int main(void)
 	curs_set(0);
 	start_color();
 	refresh();
-	wnd = newwin(6, 18, 2, 4);
+	wnd = newwin(120, 120, 2, 4);
+    keypad(wnd, 1);
 	box(wnd, '|', '-');
-	subwnd = derwin(wnd, 4, 16, 1, 1);
-	wprintw(subwnd, "Hello, brave new curses world!\n");
+    text_wnd = derwin(wnd, 100, WINDOW_WIDTH, 0, 0);
+    command_wnd = derwin(wnd, 20, WINDOW_WIDTH, 100, 0);
 	wrefresh(wnd);
+    input_text(windows, text, MAX_DOC_SIZE);
+    free(text);
 	delwin(subwnd);
 	delwin(wnd);
-	move(9, 0);
-	printw("Press any key to continue...");
-	refresh();
-	getch();
 	endwin();
 	exit(EXIT_SUCCESS);
 }
@@ -43,8 +44,4 @@ void sig_winch(int signo){
 	struct winsize size;
 	ioctl(fileno(stdout), TIOCGWINSZ, (char *) &size);
 	resizeterm(size.ws_row, size.ws_col);
-}
-
-void text_input(WINDOW * win, size_t max_len){
-	
 }
