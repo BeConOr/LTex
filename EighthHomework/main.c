@@ -5,6 +5,7 @@
 #include <ncurses.h>
 #include <malloc.h>
 #include "input.h"
+#include <stdio.h>
 
 #define MAX_DOC_SIZE 20971520
 #define WINDOW_WIDTH 120
@@ -13,9 +14,13 @@
 
 void sig_winch(int signo);
 
-int main(void)
+int main(int argc, char ** argv)
 {
-	WINDOW * wnd;
+	if(argc <= 1){
+        printf("Error: no file name.\n");
+        return 0;
+    }
+    WINDOW * wnd;
 	WINDOW * text_wnd;
     WINDOW * command_wnd;
 	
@@ -35,7 +40,7 @@ int main(void)
     box(text_wnd, '*', '*');
     box(command_wnd, '+', '+');
     refresh();
-    input_text(&text_wnd, &command_wnd, WINDOW_WIDTH, text, MAX_DOC_SIZE);
+    input_text(&text_wnd, &command_wnd, WINDOW_WIDTH, text, MAX_DOC_SIZE, argv[1]);
     free(text);
 	delwin(text_wnd);
 	delwin(command_wnd);
