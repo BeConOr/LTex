@@ -3,7 +3,7 @@
 static int compare_str(char * first, char * second);
 static void backspace(WINDOW * win, size_t * number);
 
-int input_command(WINDOW * win, char * text, size_t max_len){
+int input_command(WINDOW * win, char * text, size_t max_len, char * name){
 	char * saveCommand = ":w";
     char * closeCommand = ":q";
     char * closeSaveCommand = ":wq";
@@ -13,7 +13,7 @@ int input_command(WINDOW * win, char * text, size_t max_len){
 	char curr_char;
 	char command[] = {0, 0, 0, 0};
 	while(((curr_char = wgetch (win)) != '\n') && (curr_char_number < 3)){
-		if(KEY_EXIT == curr_char){
+		if(KEY_END == curr_char){
 			return 1;
 		}
 		if(KEY_BACKSPACE == curr_char){
@@ -25,7 +25,9 @@ int input_command(WINDOW * win, char * text, size_t max_len){
 	}
     int commandFlag = compare_str(command, saveCommand);
     if(1 == commandFlag) {
-        //Add commands to write text in file.
+        FILE * file = fopen(name, "a");
+        fputs(text, file);
+        fclose(file);
         return 1;
     }
     commandFlag = compare_str(command, continueCommand);
@@ -34,7 +36,9 @@ int input_command(WINDOW * win, char * text, size_t max_len){
     }
     commandFlag = compare_str(command, closeSaveCommand);
     if(1 == commandFlag) {
-        //Add commands to write text in file.
+        FILE * file = fopen(name, "a");
+        fputs(text, file);
+        fclose(file);
         return 0;
     }
     commandFlag = compare_str(command, closeCommand);
