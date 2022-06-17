@@ -3,7 +3,7 @@
 static int compare_str(char * first, char * second);
 static void backspace(WINDOW * win, size_t * number);
 
-void input_command(WINDOW * win, char * text, size_t max_len){
+int input_command(WINDOW * win, char * text, size_t max_len){
 	char * saveCommand = ":w";
     char * closeCommand = ":q";
     char * closeSaveCommand = ":wq";
@@ -11,12 +11,12 @@ void input_command(WINDOW * win, char * text, size_t max_len){
 
     size_t curr_char_number = 0;
 	char curr_char;
-	char * command = {0, 0, 0, 0};
+	char command[] = {0, 0, 0, 0};
 	while(((curr_char = wgetch (win)) != '\n') && (curr_char_number < 3)){
-		if(KEY_EXIT == ch){
+		if(KEY_EXIT == curr_char){
 			return 1;
 		}
-		if(KEY_BACKSPACE == ch){
+		if(KEY_BACKSPACE == curr_char){
             backspace(win, &curr_char_number);
 			continue;
 		}
