@@ -1,42 +1,38 @@
 #include "input.h"
 
-void input_text(WINDOW ** text_window, WINDOW ** command_window, int max_text_window_size, char * text, size_t max_len, char * file){
-    size_t curr_char_number = 0;
+void input_text(WINDOW ** text_window, WINDOW ** command_window, int max_text_window_size, struct TEXT * text, size_t max_len, char * file){
 	char curr_char;
-	while((curr_char_number < max_len - 1)){
+    keypad(*text_window, TRUE);
+    wrefresh(*text_window);
+
+	while((text->text_length < max_len - 1)){
         curr_char = wgetch (*text_window);
-        if(KEY_BREAK == curr_char){
-			text[curr_char_number] = 0;
-			int command = input_command(*command_window, text, max_len, file);
+        if(KEY_F(1) == curr_char){
+			text->content[text->text_length] = 0;
+			int command = input_command(command_window, text->content, file);
 			if(0 == command) return;
+            continue;
 		}
-        if('\n' == curr_char){
-            wechochar(*text_window, '\n');
-            refresh();
-        }
 		if(KEY_BACKSPACE == curr_char){
-			if(0 == curr_char_number){
+			if(0 == text->text_length){
 				continue;
 			}
 			int x, y;
 			getyx(*text_window, y, x);
 			if(x > 0){
-				wmove(*text_window, y, x-2);
-                wprintw(*text_window, "  ");
-                wechochar(*text_window, ' ');
+				mvwaddch(*text_window, y, x-1, ' ');
                 wrefresh(*text_window);
-                wmove(*text_window, y, x-2);
+                wmove(*text_window, y, x-1);
 			}else{
-				wmove(*text_window, y-1, max_text_window_size-1);
-                wprintw(*text_window, "  ");
+                mvwaddch(*text_window, y-1, max_text_window_size - 1, ' ');
                 wrefresh(*text_window);
-                wmove(*text_window, y-1, max_text_window_size-1);
+                wmove(*text_window, y-1, max_text_window_size - 1);
 			}
-			curr_char_number--;
+			text->text_length--;
 			continue;
 		}
-		text[curr_char_number++] = curr_char;
+		text->content[text->text_length++] = curr_char;
 		wechochar(*text_window, curr_char);
 	}
-	text[curr_char_number] = 0;
+	text->content[text->text_length] = 0;
 }

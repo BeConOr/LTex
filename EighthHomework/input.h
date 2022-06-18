@@ -11,7 +11,12 @@ struct INPUT_WINDOWS{
     int max_text_window_size;
 };
 
-void input_text(WINDOW ** text_window, WINDOW ** command_window, int max_text_window_size, char * text, size_t max_len, char * file);
-int input_command(WINDOW * win, char * text, size_t max_len, char * name);
+struct TEXT{
+    char * content;
+    size_t text_length;
+};
+
+void input_text(WINDOW ** text_window, WINDOW ** command_window, int max_text_window_size, struct TEXT * text, size_t max_len, char * file);
+int input_command(WINDOW ** win, char * text, char * name);
 
 #endif

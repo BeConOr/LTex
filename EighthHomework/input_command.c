@@ -3,8 +3,11 @@
 static int compare_str(char * first, char * second);
 static void backspace(WINDOW * win, size_t * number);
 
-int input_command(WINDOW * win, char * text, size_t max_len, char * name){
-	char * saveCommand = ":w";
+int input_command(WINDOW ** win, char * text, char * name){
+	keypad(*win, TRUE);
+    wrefresh(*win);
+
+    char * saveCommand = ":w";
     char * closeCommand = ":q";
     char * closeSaveCommand = ":wq";
     char * continueCommand = "i";
@@ -12,20 +15,20 @@ int input_command(WINDOW * win, char * text, size_t max_len, char * name){
     size_t curr_char_number = 0;
 	char curr_char;
 	char command[] = {0, 0, 0, 0};
-	while(((curr_char = wgetch (win)) != '\n') && (curr_char_number < 3)){
-		if(KEY_END == curr_char){
+	while(((curr_char = wgetch (*win)) != '\n') && (curr_char_number < 3)){
+		if(KEY_F(1) == curr_char){
 			return 1;
 		}
 		if(KEY_BACKSPACE == curr_char){
-            backspace(win, &curr_char_number);
+            backspace(*win, &curr_char_number);
 			continue;
 		}
 		command[curr_char_number++] = curr_char;
-		wechochar(win, curr_char);
+		wechochar(*win, curr_char);
 	}
     int commandFlag = compare_str(command, saveCommand);
     if(1 == commandFlag) {
-        FILE * file = fopen(name, "a");
+        FILE * file = fopen(name, "w");
         fputs(text, file);
         fclose(file);
         return 1;
@@ -36,7 +39,7 @@ int input_command(WINDOW * win, char * text, size_t max_len, char * name){
     }
     commandFlag = compare_str(command, closeSaveCommand);
     if(1 == commandFlag) {
-        FILE * file = fopen(name, "a");
+        FILE * file = fopen(name, "w");
         fputs(text, file);
         fclose(file);
         return 0;
@@ -57,7 +60,7 @@ static int compare_str(char * first, char * second){
 }
 
 static void backspace(WINDOW * win, size_t * number){
-    if(0 == number){
+    if(0 == *number){
         return;
     }
     int x, y;
@@ -65,5 +68,5 @@ static void backspace(WINDOW * win, size_t * number){
     mvwaddch(win, y, x-1, ' ');
     wrefresh(win);
     wmove(win, y, x-1);
-    number--;
+    (*number)--;
 }

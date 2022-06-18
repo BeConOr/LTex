@@ -8,9 +8,6 @@
 #include <stdio.h>
 
 #define MAX_DOC_SIZE 20971520
-#define WINDOW_WIDTH 120
-#define TEXT_STRING 20
-#define COMMAND_STRING 1
 
 void sig_winch(int signo);
 
@@ -20,32 +17,56 @@ int main(int argc, char ** argv)
         printf("Error: no file name.\n");
         return 0;
     }
+
     WINDOW * wnd;
 	WINDOW * text_wnd;
     WINDOW * command_wnd;
+
+    struct TEXT text;
 	
-	char * text = (char *) malloc(MAX_DOC_SIZE * sizeof(char));
+	text.content = (char *) malloc(MAX_DOC_SIZE * sizeof(char));
+    text.text_length = 0;
 	
 	initscr();
 	signal(SIGWINCH, sig_winch);
 	cbreak();
+    noecho();
 	curs_set(0);
 	start_color();
 	refresh();
-	wnd = newwin(TEXT_STRING + COMMAND_STRING + 5, WINDOW_WIDTH, 10, 4);
-    keypad(wnd, 1);
-	box(wnd, '|', '-');
-    text_wnd = derwin(wnd, TEXT_STRING, WINDOW_WIDTH, 0, 0);
-    command_wnd = derwin(wnd, COMMAND_STRING+2, WINDOW_WIDTH, TEXT_STRING+2, 0);
-    box(text_wnd, '*', '*');
-    box(command_wnd, '+', '+');
+
+	wnd = newwin(LINES, COLS, 0, 0);
+    keypad(wnd, TRUE);
+	box(wnd, 0, 0);
+
+    int input_area_width = COLS - 2;
+    int command_area_height = 3;
+    int text_area_height = LINES - command_area_height - 3;
+
+    text_wnd = derwin(wnd, text_area_height, input_area_width, 1, 1);
+    command_wnd = derwin(wnd, command_area_height, input_area_width, text_area_height + 1, 1);
+
+    FILE * file = fopen(argv[1], "r");
+    if(file != NULL){
+        char curr_char;
+        while((curr_char = fgetc(file)) != EOF){
+            waddch(text_wnd, curr_char);
+            text.content[text.text_length++] = curr_char;
+        }
+        fclose(file);
+    }
+
     refresh();
-    input_text(&text_wnd, &command_wnd, WINDOW_WIDTH, text, MAX_DOC_SIZE, argv[1]);
-    free(text);
+
+    input_text(&text_wnd, &command_wnd, input_area_width, &text, MAX_DOC_SIZE, argv[1]);
+
+    free(text.content);
+
 	delwin(text_wnd);
 	delwin(command_wnd);
 	delwin(wnd);
 	endwin();
+
 	exit(EXIT_SUCCESS);
 }
 
