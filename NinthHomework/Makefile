@@ -1,7 +1,7 @@
 BIN := my_commander
 SOURCES := main.c
 EDITOR_HEADERS := input.h
-HEADERS := text_editor.h
+HEADERS := text_editor.h commander.h
 CC := gcc
 OBJECTS := main.o
 EDITOR_LIBRARY := linput
