@@ -36,15 +36,15 @@ int main(int argc, char ** argv)
 	refresh();
 
 	wnd = newwin(LINES, COLS, 0, 0);
-    keypad(wnd, TRUE);
+//    keypad(wnd, 1);
 	box(wnd, 0, 0);
 
     int input_area_width = COLS - 2;
-    int command_area_height = 3;
-    int text_area_height = LINES - command_area_height - 3;
+    int command_area_height = 1;
+    int text_area_height = LINES - command_area_height - 1;
 
     text_wnd = derwin(wnd, text_area_height, input_area_width, 1, 1);
-    command_wnd = derwin(wnd, command_area_height, input_area_width, text_area_height + 1, 1);
+    command_wnd = derwin(wnd, command_area_height, input_area_width, text_area_height, 1);
 
     FILE * file = fopen(argv[1], "r");
     if(file != NULL){
@@ -56,9 +56,9 @@ int main(int argc, char ** argv)
         fclose(file);
     }
 
-    refresh();
+    wrefresh(wnd);
 
-    input_text(&text_wnd, &command_wnd, input_area_width, &text, MAX_DOC_SIZE, argv[1]);
+    input_text(&wnd, &text_wnd, &command_wnd, input_area_width, &text, MAX_DOC_SIZE, argv[1]);
 
     free(text.content);
 
