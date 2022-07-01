@@ -10,6 +10,8 @@
 #include "text_editor.h"
 #include <stdio.h>
 #include <dirent.h>
+#include <string.h>
+#include <unistd.h>
 
 struct windows_list{
     struct windows_list * next;
