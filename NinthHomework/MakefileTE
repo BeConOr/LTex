@@ -1,0 +1,32 @@
+BIN := text_editor.o
+SOURCES := main.c
+HEADERS := input.h
+CC := gcc
+OBJECTS := main.o
+LIBRARY := linput
+CURSES := lncurses
+LIBFILES := libinput.a
+EDITOR_LIBFILES := libteditor.a
+LIBOBJ := input_command.o input_text.o
+CFLAGS := -g
+OFLAGS := -c
+
+.PHONY: clean
+
+$(EDITOR_LIBFILES): $(BIN)
+	ar cr $(EDITOR_LIBFILES) $(BIN)
+
+$(BIN): $(LIBFILES) text_editor.c
+	$(CC) -o $(OFLAGS) text_editor.c $(CFLAGS) -L. -$(LIBRARY) -$(CURSES)
+
+$(LIBFILES): $(LIBOBJ)
+	ar cr $(LIBFILES) $(LIBOBJ)
+
+input_text.o: input_text.c
+	$(CC) $(OFLAGS) input_text.c $(CFLAGS) -L. -$(CURSES)
+
+input_command.o: input_command.c
+	$(CC) $(OFLAGS) input_command.c $(CFLAGS) -L. -$(CURSES)
+
+clean:
+	rm -f $(BIN) *.o *.a
