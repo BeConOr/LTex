@@ -17,7 +17,7 @@ $(EDITOR_LIBFILES): $(BIN)
 	ar cr $(EDITOR_LIBFILES) $(BIN)
 
 $(BIN): $(LIBFILES) text_editor.c
-	$(CC) -o $(OFLAGS) text_editor.c $(CFLAGS) -L. -$(LIBRARY) -$(CURSES)
+	$(CC) $(OFLAGS) text_editor.c $(CFLAGS) -L. -$(LIBRARY) -$(CURSES)
 
 $(LIBFILES): $(LIBOBJ)
 	ar cr $(LIBFILES) $(LIBOBJ)
