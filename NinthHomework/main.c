@@ -49,7 +49,7 @@ int main(int argc, char ** argv)
 //        exit(1);
 //    };
 
-    wmove(left_wnd, 1, 1);
+    wmove(left_wnd, 0, 0);
     int dir_number = 0;
 
     struct dirent ** directory_list;
@@ -111,6 +111,7 @@ int main(int argc, char ** argv)
                 strcpy(dr_name, curr_path);
                 clear_resources(left_wnd, dir_number, &directory_list, &points_list_wnd);
                 wclear(left_wnd);
+                box(left_wnd, 0, 0);
                 dir_number = open_target_dir(left_wnd, dr_name, &directory_list, &points_list_wnd,
                                              commander_area_width);
                 current_point = 0;
@@ -202,7 +203,7 @@ int open_target_dir(WINDOW * main_wnd, char * name, struct dirent *** dir_list, 
         }
         int x, y;
         getyx(main_wnd, y, x);
-        (*wnd_list)[i] = derwin(main_wnd, 1, width - 2, y, x);
+        (*wnd_list)[i] = derwin(main_wnd, 1, width - 2, y + 1, x + 1);
         if(i == 0){
             wattron((*wnd_list)[i], COLOR_PAIR(2));
             wbkgd((*wnd_list)[i], COLOR_PAIR(2));

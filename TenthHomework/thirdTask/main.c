@@ -1,10 +1,12 @@
 #include "my_bash.h"
 
 void sig_winch(int signo);
-void clear_resources(WINDOW * main_wnd, int number, struct dirent *** dir_list, WINDOW *** wnd_list);
+void clear_resources(WINDOW * main_wnd, int number, struct dirent *** dir_list);
 int compare_str(char * first, char * second);
+int find_substr(char * string, char * substr);
 void merge_string(char ** one, char ** two);
 static void backspace(WINDOW * win, size_t * number);
+void prepare_wnd(WINDOW * wnd);
 
 int main(int argc, char ** argv)
 {
@@ -16,7 +18,6 @@ int main(int argc, char ** argv)
     WINDOW * wnd;
 	WINDOW * current_wnd;
     WINDOW * left_wnd;
-    WINDOW * right_wnd;
 
 	initscr();
 	signal(SIGWINCH, sig_winch);
@@ -37,11 +38,10 @@ int main(int argc, char ** argv)
 
     current_wnd = left_wnd;
 
-    box(left_wnd, 0, 0);
+    prepare_wnd(left_wnd);
 
     wrefresh(wnd);
 
-    wmove(left_wnd, 1, 1);
     int dir_number = 0;
 
     struct dirent ** directory_list;
@@ -63,115 +63,118 @@ int main(int argc, char ** argv)
     char * currentDirContent = "ls";
     char * startCommander = "mcmnd";
     char * startTextEditor = "teditor";
+    char * clearWindowCommand = "clear";
 
+    int startFlag = 1;
     while(1) {
-        while (((curr_char = wgetch(*win)) != '\n') && (curr_char_number < 100)) {
+        curr_char_number = 0;
+        while (((curr_char = wgetch(left_wnd)) != '\n') && (curr_char_number < 100)) {
             if (KEY_BACKSPACE == curr_char) {
                 backspace(left_wnd, &curr_char_number);
                 continue;
             }
-            if((KEY_UP == curr_char) || (KEY_DOWN == curr_char)) {
-                wattron(points_list_wnd[current_point], COLOR_PAIR(1));
-                wbkgd(points_list_wnd[current_point], COLOR_PAIR(1));
-                wrefresh(points_list_wnd[current_point]);
-                if (KEY_UP == curr_char) {
-                    if (current_point > 0) {
-                        current_point--;
-                    }
-                }
-                if (KEY_DOWN == curr_char) {
-                    if (current_point < dir_number - 1) {
-                        current_point++;
-                    }
-                }
-                wattron(points_list_wnd[current_point], COLOR_PAIR(2));
-                wbkgd(points_list_wnd[current_point], COLOR_PAIR(2));
-                wrefresh(points_list_wnd[current_point]);
-            }
-            if('\n' == curr_char){
-                if(DT_DIR == directory_list[current_point]->d_type) {
-                    strcpy(dr_name, directory_list[current_point]->d_name);
-                    if (compare_str(directory_list[current_point]->d_name, "..")) {
-                        if(!compare_str(curr_path, "/")) {
-                            size_t sl_pos = 0;
-                            for (size_t i = 0; curr_path[i] != 0; ++i) {
-                                if('/' == curr_path[i]) sl_pos = i;
-                            }
-                            if(sl_pos != 0) {
-                                curr_path[sl_pos] = 0;
-                            }else{
-                                curr_path[1] = 0;
-                            }
-                        }
-                    }
-                    else{
-                        if(!compare_str(directory_list[current_point]->d_name, ".")){
-                            //strcpy(temp_name, directory_list[current_point]->d_name);
-                            //snprintf(dr_name, 1224, "%s%c%s", curr_path, '/', temp_name);
-                            merge_string(&curr_path, &splitter);
-                            merge_string(&curr_path, &dr_name);
-                        }
-                    }
-                    strcpy(dr_name, curr_path);
-                    clear_resources(left_wnd, dir_number, &directory_list, &points_list_wnd);
-                    wclear(left_wnd);
-                    dir_number = open_target_dir(left_wnd, dr_name, &directory_list, &points_list_wnd,
-                                                 commander_area_width);
-                    current_point = 0;
-                    wrefresh(left_wnd);
-                }
-//            if(DT_CHR == directory_list[current_point]->d_type){
-//                strcpy(temp_name, directory_list[current_point]->d_name);
-//                snprintf(dr_name, 1224, "%s%c%s", curr_path, '/', temp_name);
-//                edit_text_file(dr_name);
-//            }
-            }
             if(KEY_F(1) == curr_char){
+                startFlag = 0;
                 break;
             }
             command[curr_char_number++] = curr_char;
-            wechochar(*win, curr_char);
+            wechochar(left_wnd, curr_char);
         }
+        if(0 == startFlag) break;
         command[curr_char_number] = 0;
-        int commandFlag = compare_str(command, cd);
+        int commandFlag = compare_str(command, currentDirCommand);
         if (1 == commandFlag) {
             int y, x;
             getyx(left_wnd, y, x);
-            wmove(left_wnd, y + 1, 0);
+            wmove(left_wnd, y + 1, 1);
             wprintw(left_wnd, "%s", curr_path);
-            FILE *file = fopen(name, "w");
-            fputs(text, file);
-            fclose(file);
-            return 1;
+            getyx(left_wnd, y, x);
+            wmove(left_wnd, y + 1, 1);
+            continue;
         }
-        commandFlag = compare_str(command, continueCommand);
+        commandFlag = compare_str(command, currentDirContent);
         if (1 == commandFlag) {
-            return 1;
+            int y, x;
+            for(size_t i = 0; i < dir_number; ++i){
+                getyx(left_wnd, y, x);
+                wmove(left_wnd, y + 1, 1);
+                wprintw(left_wnd, "%s", directory_list[i]->d_name);
+            }
+            getyx(left_wnd, y, x);
+            wmove(left_wnd, y + 1, 1);
+            continue;
         }
-        commandFlag = compare_str(command, closeSaveCommand);
-        if (1 == commandFlag) {
-            FILE *file = fopen(name, "w");
-            fputs(text, file);
-            fclose(file);
-            return 0;
+        char * finding = strstr(command, currentDirCommand);
+        if (NULL != finding) {
+            finding += 3;
+            if (compare_str(finding, "..")) {
+                if(!compare_str(curr_path, "/")) {
+                    size_t sl_pos = 0;
+                    for (size_t i = 0; curr_path[i] != 0; ++i) {
+                        if('/' == curr_path[i]) sl_pos = i;
+                    }
+                    if(sl_pos != 0) {
+                        curr_path[sl_pos] = 0;
+                    }else{
+                        curr_path[1] = 0;
+                    }
+                }
+            }else{
+                if(!compare_str(finding, ".")){
+                    if(!compare_str(curr_path, "/")) {
+                        merge_string(&curr_path, &splitter);
+                    }
+                    merge_string(&curr_path, &finding);
+                }
+            }
+            clear_resources(left_wnd,dir_number, &directory_list);
+            dir_number = scandir(curr_path, &directory_list, 0, alphasort);
+            int y, x;
+            getyx(left_wnd, y, x);
+            wmove(left_wnd, y + 1, 1);
+            wprintw(left_wnd, "%s", curr_path);
+            getyx(left_wnd, y, x);
+            wmove(left_wnd, y + 1, 1);
+            continue;
         }
-        commandFlag = compare_str(command, closeCommand);
+        commandFlag = compare_str(command, startCommander);
         if (1 == commandFlag) {
-            return 0;
+            int status;
+            pid_t pid = fork();
+
+            if(pid == 0){
+                execl("../../NinthHomework/my_commander", "my_commander", curr_path, (char *) NULL);
+                exit(0);
+            }
+            waitpid(pid, &status, 0);
+            prepare_wnd(left_wnd);
+            continue;
+        }
+        commandFlag = compare_str(command, clearWindowCommand);
+        if (1 == commandFlag) {
+            prepare_wnd(left_wnd);
+            continue;
+        }
+        finding = strstr(command, startTextEditor);
+        if (NULL != finding) {
+            finding += 8;
+            int status;
+            pid_t pid = fork();
+
+            if(pid == 0){
+                execl("../../EighthHomework/text_editor", "text_editor", finding, (char *) NULL);
+                exit(0);
+            }
+            waitpid(pid, &status, 0);
+            prepare_wnd(left_wnd);
+            continue;
         }
     }
 
-    clear_resources(left_wnd,dir_number, &directory_list, &points_list_wnd);
+    clear_resources(left_wnd,dir_number, &directory_list);
 
-//    while(dir_number--) {
-//        free(directory_list[dir_number]);
-//        delwin(points_list_wnd[dir_number]);
-//    }
-//    free(directory_list);
-//    free(points_list_wnd);
 
     delwin(left_wnd);
-    delwin(right_wnd);
     delwin(wnd);
 	endwin();
 
@@ -196,13 +199,18 @@ void merge_string(char ** one, char ** two){
     (*one)[nul_pos] = 0;
 }
 
-void clear_resources(WINDOW * main_wnd, int number, struct dirent *** dir_list, WINDOW *** wnd_list){
+void clear_resources(WINDOW * main_wnd, int number, struct dirent *** dir_list){
     while(number--) {
         free((*dir_list)[number]);
-        delwin((*wnd_list)[number]);
     }
     free((*dir_list));
-    free((*wnd_list));
+}
+
+void prepare_wnd(WINDOW * wnd){
+    wclear(wnd);
+    box(wnd, 0, 0);
+    wrefresh(wnd);
+    wmove(wnd, 1, 1);
 }
 
 int compare_str(char * first, char * second){
@@ -210,11 +218,10 @@ int compare_str(char * first, char * second){
         if(first[i] != second[i]){
             return 0;
         }
-        if((first[i] == 0) && (second[i] == 0)) break;
+        if((first[i] == 0) || (second[i] == 0)) break;
     }
     return 1;
 }
-
 
 static void backspace(WINDOW * win, size_t * number){
     if(0 == *number){

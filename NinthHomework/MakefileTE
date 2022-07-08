@@ -7,7 +7,7 @@ LIBRARY := linput
 CURSES := lncurses
 LIBFILES := libinput.a
 EDITOR_LIBFILES := libteditor.a
-LIBOBJ := input_command.o input_text.o
+LIBOBJ := input_text.o input_command.o
 CFLAGS := -g
 OFLAGS := -c
 

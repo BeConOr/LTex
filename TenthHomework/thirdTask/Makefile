@@ -1,10 +1,9 @@
-BIN := my_commander
+BIN := my_bash
 SOURCES := main.c
-HEADERS := text_editor.h commander.h
+HEADERS := my_bash.h
 CC := gcc
 OBJECTS := main.o
-EDITOR_LIBRARY := linput
-LIBRARY := lteditor
+LIBRARY :=
 CURSES := lncurses
 CFLAGS := -g
 OFLAGS := -c
@@ -12,7 +11,7 @@ OFLAGS := -c
 .PHONY: clean
 
 $(BIN): $(OBJECTS) $(LIBFILES)
-	$(CC) -o $(BIN) $(OBJECTS) $(CFLAGS) -L. -$(LIBRARY) -$(CURSES)
+	$(CC) -o $(BIN) $(OBJECTS) $(CFLAGS) -L. $(LIBRARY) -$(CURSES)
 $(OBJECTS): $(HEADERS)
 
 
