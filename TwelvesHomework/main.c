@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <unistd.h>
 #include <stdlib.h>
 #include <pthread.h>
 #define THREAD_NMB 4
@@ -29,8 +30,10 @@ void *customer(void*  info){
                 value = tinfo->need;
                 tinfo->need = 0;
             }
+            
+            tinfo->shops[i] -= value;
 
-            printf("Customer #%d bought in shop #%d value: %d", tinfo->tnum, i + 1, value);
+            printf("Customer #%d bought in shop #%d value: %d. Shop now has %d. Now need %d\n", tinfo->tnum, i + 1, value, tinfo->shops[i], tinfo->need);
 
             pthread_spin_unlock(tinfo->spin_list + i);
 
@@ -52,32 +55,32 @@ void *customer(void*  info){
 void *shop_empl(void*  info){
     struct thread * tinfo = (struct thread *) info;
 
-    for(int i = 0; i<5; ++i){
-        pthread_spin_lock(tinfo->spin_list + i);
+    int stopFlag = 0;
+    
+    while(0 == stopFlag){
+	    for(int i = 0; i<5; ++i){
+		pthread_spin_lock(tinfo->spin_list + i);
 
-        int value;
-        tinfo->shops[i] += 500;
-        printf("Put in shop #%d, now value is in shop #%d", i + 1, tinfo->shops[i]);
+		int value;
+		tinfo->shops[i] += 500;
+		printf("Put in shop #%d, now value is in shop %d\n", i + 1, tinfo->shops[i]);
 
-        pthread_spin_unlock(tinfo->spin_list + i);
+		pthread_spin_unlock(tinfo->spin_list + i);
+		stopFlag = 1;
 
-        int stopFlag = 1;
+		for(int i = 0; (i < THREAD_NMB - 1) && (stopFlag != 0) ; ++i){
+		    pthread_spin_lock(tinfo->private_spin + i);
 
-        for(int i = 0; (i < THREAD_NMB - 1) && (stopFlag != 0) ; ++i){
-            pthread_spin_lock(tinfo->private_spin + i);
+		    if(1 == stopFlags[i]){
+		        stopFlag = 1;
+		    }else{
+		        stopFlag = 0;
+		    }
 
-            if(1 == stopFlags[i]){
-                stopFlag = 1;
-            }else{
-                stopFlag = 0;
-            }
-
-            pthread_spin_unlock(tinfo->private_spin + i);
-        }
-        
-        if(1 == stopFlag){
-            break;
-        }
+		    pthread_spin_unlock(tinfo->private_spin + i);
+		}
+		if(1 == stopFlag) break;
+	    }
     }
     return NULL;
 }
@@ -96,7 +99,8 @@ int main(void){
 
     for(int i = 0; i < 5; ++i){
         pthread_spin_init(spinlock_list + i, PTHREAD_PROCESS_SHARED);
-        shops[i] = 1000;
+        shops[i] = 950 + rand()%100;
+        srand(shops[i]);
     }
 
     for(int i = 0; i < 3; ++i){
